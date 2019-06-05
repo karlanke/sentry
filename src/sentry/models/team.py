@@ -98,6 +98,15 @@ class TeamManager(BaseManager):
 
         return results
 
+    def get_users_from_teams(self, organization_id, teams):
+        from sentry.models import User
+        return User.objects.filter(
+            sentry_orgmember_set__organization_id=organization_id,
+            sentry_orgmember_set__organizationmemberteam__team__in=teams,
+            sentry_orgmember_set__organizationmemberteam__is_active=True,
+            is_active=True,
+        )
+
 
 # TODO(dcramer): pull in enum library
 class TeamStatus(object):
