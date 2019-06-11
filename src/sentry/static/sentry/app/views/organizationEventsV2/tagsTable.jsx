@@ -12,7 +12,7 @@ const TagsTable = props => {
   return (
     <div>
       <TagHeading>{t('Tags')}</TagHeading>
-      <table>
+      <StyledTable>
         <tbody>
           {props.tags.map(tag => (
             <StyledTr key={tag.key}>
@@ -25,7 +25,7 @@ const TagsTable = props => {
             </StyledTr>
           ))}
         </tbody>
-      </table>
+      </StyledTable>
     </div>
   );
 };
@@ -55,6 +55,10 @@ const TagKey = styled('td')`
 
 const TagValue = styled(TagKey)`
   text-align: right;
+`;
+
+const StyledTable = styled('table')`
+  width: 100%;
 `;
 
 export default withRouter(TagsTable);
