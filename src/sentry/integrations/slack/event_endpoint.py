@@ -59,7 +59,7 @@ class SlackEventEndpoint(Endpoint):
             return
 
         payload = {
-            'token': integration.metadata['access_token'],
+            'token': integration.metadata['user_access_token'],
             'channel': data['channel'],
             'ts': data['message_ts'],
             'unfurls': json.dumps({

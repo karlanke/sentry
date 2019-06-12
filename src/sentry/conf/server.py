@@ -1606,3 +1606,5 @@ KAFKA_TOPICS = {
         'topic': KAFKA_EVENTS,
     },
 }
+SLACK_INTEGRATION_USE_WST = False
+
