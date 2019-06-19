@@ -179,42 +179,47 @@ class SlackNotifyServiceAction(EventAction):
         # Look for channel ID
         channels_payload = dict(token_payload, **{
             'exclude_archived': False,
-            'exclude_members': True,
+            'types': 'private_channel,public_channel',
+            'limit': 1000
         })
 
-        resp = session.get('https://slack.com/api/channels.list', params=channels_payload)
-        resp = resp.json()
-        if not resp.get('ok'):
-            self.logger.info('rule.slack.channel_list_failed', extra={'error': resp.get('error')})
-            return None
+        # Slack limits the response of `channels.list` to 1000 channels, paginate if needed
+        cursor = True
 
-        channel_id = {c['name']: c['id'] for c in resp['channels']}.get(name)
+        while cursor:
+            resp = session.get('https://slack.com/api/conversations.list',
+                               params=dict(channels_payload, **{
+                                   'cursor': cursor
+                               }))
+            resp = resp.json()
+            if not resp.get('ok'):
+                self.logger.info('rule.slack.channel_list_failed', extra={'error': resp.get('error')})
+                return None
 
-        if channel_id:
-            return (CHANNEL_PREFIX, channel_id)
+            cursor = resp.get('response_metadata', {}).get('next_cursor', None)
 
-        # Channel may be private
-        resp = session.get('https://slack.com/api/groups.list', params=channels_payload)
-        resp = resp.json()
-        if not resp.get('ok'):
-            self.logger.info('rule.slack.group_list_failed', extra={'error': resp.get('error')})
-            return None
+            channel_id = {c['name']: c['id'] for c in resp['channels']}.get(name)
 
-        group_id = {c['name']: c['id'] for c in resp['groups']}.get(name)
-
-        if group_id:
-            return (CHANNEL_PREFIX, group_id)
+            if channel_id:
+                return (CHANNEL_PREFIX, channel_id)
 
         # Channel may actually be a user
-        resp = session.get('https://slack.com/api/users.list', params=token_payload)
-        resp = resp.json()
-        if not resp.get('ok'):
-            self.logger.info('rule.slack.user_list_failed', extra={'error': resp.get('error')})
-            return None
+        cursor = True
+        while cursor:
+            resp = session.get('https://slack.com/api/users.list',
+                               params=dict(token_payload, **{
+                                   'cursor': cursor
+                               }))
+            resp = resp.json()
+            if not resp.get('ok'):
+                self.logger.info('rule.slack.user_list_failed', extra={'error': resp.get('error')})
+                return None
 
-        member_id = {c['name']: c['id'] for c in resp['members']}.get(name)
+            cursor = resp.get('response_metadata', {}).get('next_cursor', None)
 
-        if member_id:
-            return (MEMBER_PREFIX, member_id)
+            member_id = {c['name']: c['id'] for c in resp['members']}.get(name)
+
+            if member_id:
+                return (MEMBER_PREFIX, member_id)
 
         return None
