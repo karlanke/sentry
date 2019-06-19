@@ -184,9 +184,10 @@ class SlackNotifyServiceAction(EventAction):
         })
 
         # Slack limits the response of `channels.list` to 1000 channels, paginate if needed
-        cursor = True
-
-        while cursor:
+        cursor = ''
+        first_run = True
+        while first_run or cursor:
+            first_run = False
             resp = session.get('https://slack.com/api/conversations.list',
                                params=dict(channels_payload, **{
                                    'cursor': cursor
@@ -204,8 +205,10 @@ class SlackNotifyServiceAction(EventAction):
                 return (CHANNEL_PREFIX, channel_id)
 
         # Channel may actually be a user
-        cursor = True
-        while cursor:
+        first_run = True
+        while first_run or cursor:
+            first_run = False
+
             resp = session.get('https://slack.com/api/users.list',
                                params=dict(token_payload, **{
                                    'cursor': cursor
