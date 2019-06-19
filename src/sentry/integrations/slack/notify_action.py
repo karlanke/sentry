@@ -206,6 +206,7 @@ class SlackNotifyServiceAction(EventAction):
 
         # Channel may actually be a user
         first_run = True
+        cursor = ''
         while first_run or cursor:
             first_run = False
 
