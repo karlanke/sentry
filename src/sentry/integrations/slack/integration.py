@@ -68,8 +68,19 @@ class SlackIntegrationProvider(IntegrationProvider):
         IntegrationFeatures.ALERT_RULE,
     ])
 
+    # Scopes differ depending on if it's a workspace app
     identity_oauth_scopes = frozenset([
         'bot',
+<<<<<<< HEAD
+=======
+        'links:read',
+        'links:write',
+    ]) if not settings.SLACK_INTEGRATION_USE_WST else frozenset([
+        'channels:read',
+        'groups:read',
+        'users:read',
+        'chat:write',
+>>>>>>> 6c609f6d99070792226743f8670618185b2c4432
         'links:read',
         'links:write',
     ])
@@ -121,7 +132,14 @@ class SlackIntegrationProvider(IntegrationProvider):
     def build_integration(self, state):
         data = state['identity']['data']
         assert data['ok']
-        
+
+        if settings.SLACK_INTEGRATION_USE_WST:
+            access_token = data['access_token']
+            user_id_slack = data['authorizing_user_id']
+        else:
+            access_token = data['bot']['bot_access_token']
+            user_id_slack = self.get_identity(data['access_token'])
+
         if settings.SLACK_INTEGRATION_USE_WST:
             access_token = data['access_token']
             user_id_slack = data['authorizing_user_id']
@@ -130,7 +148,10 @@ class SlackIntegrationProvider(IntegrationProvider):
             user_id_slack = self.get_identity(data['access_token'])
 
         scopes = sorted(self.identity_oauth_scopes)
-        
+<<<<<<< HEAD
+
+=======
+>>>>>>> 6c609f6d99070792226743f8670618185b2c4432
         team_data = self.get_team_info(access_token)
 
         metadata = {
@@ -139,12 +160,20 @@ class SlackIntegrationProvider(IntegrationProvider):
             'icon': team_data['icon']['image_132'],
             'domain_name': team_data['domain'] + '.slack.com',
         }
+<<<<<<< HEAD
+=======
 
         # When using bot tokens, we must use the user auth token for URL
         # unfurling
         if not settings.SLACK_INTEGRATION_USE_WST:
             metadata['user_access_token'] = data['access_token']
-        
+>>>>>>> 6c609f6d99070792226743f8670618185b2c4432
+
+        # When using bot tokens, we must use the user auth token for URL
+        # unfurling
+        if not settings.SLACK_INTEGRATION_USE_WST:
+            metadata['user_access_token'] = data['access_token']
+
         return {
             'name': data['team_name'],
             'external_id': data['team_id'],

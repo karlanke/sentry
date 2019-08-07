@@ -80,13 +80,16 @@ def build_attachment_title(group, event=None):
         return u'{} - {}'.format(ev_metadata['directive'], ev_metadata['uri'])
     else:
         if group.culprit:
-            return u'{} - {}'.format(group.title[:40], group.culprit)
+            return u'{} - {}'.format(group.title, group.culprit)
         return group.title
 
 
 def build_attachment_text(group, event=None):
-    ev_metadata = group.get_event_metadata()
-    ev_type = group.get_event_type()
+    # Group and Event both implement get_event_{type,metadata}
+    obj = event if event is not None else group
+    ev_metadata = obj.get_event_metadata()
+    ev_type = obj.get_event_type()
+
     if ev_type == 'error':
         return ev_metadata.get('value') or ev_metadata.get('function')
     else:
