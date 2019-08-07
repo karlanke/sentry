@@ -48,7 +48,7 @@ from sentry.utils.distutils import (
 )
 
 # The version of sentry
-VERSION = '9.1.1'
+VERSION = '9.1.2'
 
 # Hack to prevent stupid "TypeError: 'NoneType' object is not callable" error
 # in multiprocessing/util.py _exit_function when running `python
@@ -106,11 +106,11 @@ class SentryBuildCommand(BuildCommand):
 
 class SentryDevelopCommand(DevelopCommand):
     def run(self):
-        DevelopCommand.run(self)
         if not IS_LIGHT_BUILD:
             self.run_command('build_integration_docs')
             self.run_command('build_assets')
             self.run_command('build_js_sdk_registry')
+        DevelopCommand.run(self)
 
 
 cmdclass = {

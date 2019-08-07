@@ -64,7 +64,17 @@ class EventDict(CanonicalKeyDict):
     """
 
     def __init__(self, data, skip_renormalization=False, **kwargs):
-        if not skip_renormalization and not isinstance(data, EventDict):
+        is_renormalized = (
+            isinstance(data, EventDict) or
+            (isinstance(data, NodeData) and isinstance(data.data, EventDict))
+        )
+
+        with configure_scope() as scope:
+            scope.set_tag("rust.is_renormalized", is_renormalized)
+            scope.set_tag("rust.skip_renormalization", skip_renormalization)
+            scope.set_tag("rust.renormalized", "null")
+
+        if not skip_renormalization and not is_renormalized:
             rust_renormalized = _should_skip_to_python(data.get('event_id'))
             if rust_renormalized:
                 normalizer = StoreNormalizer(is_renormalize=True)
@@ -472,10 +482,11 @@ class SnubaEvent(EventCommon):
 
         self.__dict__ = snuba_values
 
-        # This should be lazy loaded and will only be accessed if we access any
-        # properties on self.data
-        node_id = SnubaEvent.generate_node_id(self.project_id, self.event_id)
-        self.data = NodeData(None, node_id, data=None)
+        # self.data is a (lazy) dict of everything we got from nodestore
+        node_id = SnubaEvent.generate_node_id(
+            self.snuba_data['project_id'],
+            self.snuba_data['event_id'])
+        self.data = NodeData(None, node_id, data=None, wrapper=EventDict)
 
     # ============================================
     # Snuba-only implementations of properties that
