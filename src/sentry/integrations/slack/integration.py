@@ -71,8 +71,6 @@ class SlackIntegrationProvider(IntegrationProvider):
     # Scopes differ depending on if it's a workspace app
     identity_oauth_scopes = frozenset([
         'bot',
-<<<<<<< HEAD
-=======
         'links:read',
         'links:write',
     ]) if not settings.SLACK_INTEGRATION_USE_WST else frozenset([
@@ -80,7 +78,6 @@ class SlackIntegrationProvider(IntegrationProvider):
         'groups:read',
         'users:read',
         'chat:write',
->>>>>>> 6c609f6d99070792226743f8670618185b2c4432
         'links:read',
         'links:write',
     ])
@@ -148,10 +145,6 @@ class SlackIntegrationProvider(IntegrationProvider):
             user_id_slack = self.get_identity(data['access_token'])
 
         scopes = sorted(self.identity_oauth_scopes)
-<<<<<<< HEAD
-
-=======
->>>>>>> 6c609f6d99070792226743f8670618185b2c4432
         team_data = self.get_team_info(access_token)
 
         metadata = {
@@ -160,14 +153,11 @@ class SlackIntegrationProvider(IntegrationProvider):
             'icon': team_data['icon']['image_132'],
             'domain_name': team_data['domain'] + '.slack.com',
         }
-<<<<<<< HEAD
-=======
 
         # When using bot tokens, we must use the user auth token for URL
         # unfurling
         if not settings.SLACK_INTEGRATION_USE_WST:
             metadata['user_access_token'] = data['access_token']
->>>>>>> 6c609f6d99070792226743f8670618185b2c4432
 
         # When using bot tokens, we must use the user auth token for URL
         # unfurling
