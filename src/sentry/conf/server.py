@@ -1121,15 +1121,15 @@ SENTRY_MAX_VARIABLE_SIZE = 8192
 
 # Prevent variables within extra context from exceeding this size in
 # characters
-SENTRY_MAX_EXTRA_VARIABLE_SIZE = 4096 * 4  # 16kb
+SENTRY_MAX_EXTRA_VARIABLE_SIZE = 4096 * 10  # 40kb
 
 # For changing the amount of data seen in Http Response Body part.
-SENTRY_MAX_HTTP_BODY_SIZE = 4096 * 4  # 16kb
+SENTRY_MAX_HTTP_BODY_SIZE = 4096 * 10  # 40kb
 
 # For various attributes we don't limit the entire attribute on size, but the
 # individual item. In those cases we also want to limit the maximum number of
 # keys
-SENTRY_MAX_DICTIONARY_ITEMS = 500
+SENTRY_MAX_DICTIONARY_ITEMS = 2000
 
 SENTRY_MAX_MESSAGE_LENGTH = 1024 * 8
 # how many frames are fat
